@@ -1,30 +1,32 @@
 # '''
 # Linked List hash table key/value pair
 # '''
+
+
 class LinkedPair:
     def __init__(self, key, value):
         self.key = key
         self.value = value
         self.next = None
 
+
 class HashTable:
     '''
     A hash table that with `capacity` buckets
     that accepts string keys
     '''
+
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
-        self.storage = [None] * capacity
-
+        self.storage = [[] for _ in range(capacity)]
 
     def _hash(self, key):
         '''
-        Hash an arbitrary key and return an integer.
+        Hash an arbitrary key and return an integer.s
 
         You may replace the Python hash with DJB2 as a stretch goal.
         '''
         return hash(key)
-
 
     def _hash_djb2(self, key):
         '''
@@ -34,7 +36,6 @@ class HashTable:
         '''
         pass
 
-
     def _hash_mod(self, key):
         '''
         Take an arbitrary key and return a valid integer index
@@ -42,8 +43,20 @@ class HashTable:
         '''
         return self._hash(key) % self.capacity
 
-
     def insert(self, key, value):
+        hash_key = self._hash_mod(key)
+        exists = False
+        bucket = self.storage[hash_key]
+        for i, kv in enumerate(bucket):
+            k, v = kv
+            if key == k:
+                exists = True
+                break
+        if exists:
+            bucket[i] = ((key, value))
+        else:
+            bucket.append((key, value))
+
         '''
         Store the value with the given key.
 
@@ -51,9 +64,6 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
-
 
     def remove(self, key):
         '''
@@ -63,8 +73,19 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        hash_key = self._hash_mod(key)
+        bucket = self.storage[hash_key]
+        exists = False
+        for i, kv in enumerate(bucket):
+            k, v = kv
+            if key == k:
+                exists = True
+                break
+        if exists:
+            del bucket[i]
+            print('Key {} deleted'.format(key))
+        else:
+            print('Key {} not found'.format(key))
 
     def retrieve(self, key):
         '''
@@ -74,8 +95,12 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        hash_key = self._hash_mod(key)
+        bucket = self.storage[hash_key]
+        for i, kv in enumerate(bucket):
+            k, v = kv
+            if key == k:
+                return v
 
     def resize(self):
         '''
@@ -84,8 +109,13 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        temp_storage = self.storage
+        self.capacity = self.capacity * 2
+        self.storage = [[] for _ in range(self.capacity)]
 
+        for i in temp_storage:
+            for j in i:
+                self.insert(j[0], j[1])
 
 
 if __name__ == "__main__":
